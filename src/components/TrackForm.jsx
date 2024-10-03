@@ -1,14 +1,28 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+
+import * as trackService from "../services/trackService.js";
 
 const initialState = {
   title: "",
   artist: "",
 };
 
-function TrackForm({ handleAddTrack }) {
+function TrackForm({ handleAddTrack, handleUpdateTrack }) {
   const [formData, setFormData] = useState(initialState);
   const navigate = useNavigate();
+  let { trackId } = useParams();
+  const isAdding = !trackId;
+
+  useEffect(() => {
+    async function fetchData(trackId) {
+      const data = await trackService.show(trackId);
+      //   console.log(data);
+      setFormData(data);
+    }
+
+    if (!isAdding) fetchData(trackId);
+  }, [trackId, isAdding]);
 
   function handleChange(e) {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -17,16 +31,21 @@ function TrackForm({ handleAddTrack }) {
   function handleSubmit(e) {
     e.preventDefault();
 
-    handleAddTrack(formData);
-
-    setFormData(initialState);
+    if (isAdding) {
+      handleAddTrack(formData);
+      setFormData(initialState);
+    } else {
+      handleUpdateTrack(formData, trackId);
+    }
 
     navigate("/");
   }
 
+  const formTitle = isAdding ? "Add New Track" : "Update Track";
+
   return (
     <>
-      <h1>Add New Track</h1>
+      <h1>{formTitle}</h1>
 
       <form onSubmit={handleSubmit}>
         <label htmlFor="title">Title</label>

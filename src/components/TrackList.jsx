@@ -1,11 +1,16 @@
 import { Link } from "react-router-dom";
 
-function TrackList({ tracks, setSelectedTrack }) {
+function TrackList({ tracks, setSelectedTrack, handleDeleteTrack }) {
+  function onDeleteClick(trackId) {
+    handleDeleteTrack(trackId);
+  }
+
   return (
     <>
-      <button>
-        <Link to="/add-track">Add New Track</Link>
-      </button>
+      <Link to="/add-track">
+        <button>Add New Track</button>
+      </Link>
+
       <h1>Track List</h1>
       <ul>
         {tracks.map((track) => (
@@ -14,6 +19,10 @@ function TrackList({ tracks, setSelectedTrack }) {
               {track.title} by {track.artist}
             </p>
             <button onClick={() => setSelectedTrack(track)}>Play</button>
+            <Link to={`/edit-track/${track._id}`}>
+              <button>Edit</button>
+            </Link>
+            <button onClick={() => onDeleteClick(track._id)}>Delete</button>
           </li>
         ))}
       </ul>
